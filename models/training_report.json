@@ -1,0 +1,31 @@
+{
+  "ranking_metrics_test": {
+    "pr_auc": 0.9695239897537193,
+    "roc_auc": 0.9990958098997855,
+    "precision_at_threshold": 0.8277395875454913,
+    "recall_at_threshold": 0.9543123543123543
+  },
+  "threshold_selection_validation": {
+    "best_threshold": 0.12,
+    "best_cost_on_validation": 3665.63,
+    "n_false_positives": 171,
+    "n_false_negatives": 34
+  },
+  "savings_report_test": {
+    "baseline_threshold": 0.5,
+    "baseline_total_cost": 38782.87,
+    "baseline_n_fp": 177,
+    "baseline_n_fn": 152,
+    "optimal_threshold": 0.12,
+    "optimal_total_cost": 23977.77,
+    "optimal_n_fp": 426,
+    "optimal_n_fn": 98,
+    "dollar_savings": 14805.100000000002,
+    "savings_pct": 38.174327995839406
+  },
+  "fp_cost_assumption": 5.0,
+  "n_fit_rows": 1102173,
+  "n_val_rows": 194502,
+  "n_test_rows": 555719,
+  "best_iteration": 784
+}

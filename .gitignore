@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+venv/
+aegis-risk-console/node_modules/
+aegis-risk-console/dist/
+*.csv
+*.parquet

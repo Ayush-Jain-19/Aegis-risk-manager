@@ -1,0 +1,95 @@
+# config/config.yaml
+#
+# WHY A CENTRAL CONFIG FILE:
+# The Sparkov dataset's raw column names (trans_date_trans_time, merch_lat,
+# unix_time, ...) are dataset-specific artifacts, not domain concepts. If
+# those strings are hardcoded inside data_preprocessing.py, train.py, and
+# later inference.py, swapping datasets (or moving to Razorpay's real schema
+# post-buildathon) means hunting through multiple files for magic strings.
+# Every script in src/ should import this file rather than redefining any
+# of these values locally.
+
+paths:
+  raw_dir: "data/raw"
+  train_raw: "data/raw/fraudTrain.csv"
+  test_raw: "data/raw/fraudTest.csv"
+  processed_dir: "data/processed"
+  train_processed: "data/processed/train_cleaned.parquet"
+  test_processed: "data/processed/test_cleaned.parquet"
+  model_dir: "models"
+  encoder_path: "models/categorical_encoders.joblib"
+
+# Raw column names as they appear in fraudTrain.csv / fraudTest.csv.
+# Everything downstream (data_preprocessing.py, train.py, inference.py)
+# references these keys, never the literal strings.
+columns:
+  index_col: "Unnamed: 0"           # artifact of how the CSV was exported
+  timestamp_col: "trans_date_trans_time"
+  cc_num_col: "cc_num"              # card/customer identifier
+  merchant_col: "merchant"
+  category_col: "category"
+  amount_col: "amt"
+  dob_col: "dob"
+  label_col: "is_fraud"
+  customer_lat_col: "lat"
+  customer_long_col: "long"
+  merchant_lat_col: "merch_lat"
+  merchant_long_col: "merch_long"
+
+# Columns dropped outright: PII/free-text with no generalizable signal
+# (first/last/street), duplicate-of-existing-signal identifiers (cc_num is
+# redundant once we've derived customer-level features; unix_time duplicates
+# trans_date_trans_time), or IDs that are unique-per-row and would just
+# teach LightGBM to memorize row identity (trans_num, the CSV index col).
+drop_columns:
+  - "Unnamed: 0"
+  - "first"
+  - "last"
+  - "street"
+  - "trans_num"
+  - "cc_num"
+  - "unix_time"
+  - "zip"          # redundant with lat/long + city/state, very high cardinality
+
+# Categorical columns to encode. NOT one-hot encoded (would explode to
+# ~700 merchant columns + ~950 job columns) — frequency or target encoded
+# into a single dense numeric column each instead.
+categorical_columns:
+  - "merchant"
+  - "category"
+  - "job"
+  - "city"
+  - "state"
+  - "gender"
+
+preprocessing:
+  # "frequency": count-based encoding, cannot leak the label (safe default,
+  #              recommended for a first pass and for judged demos where you
+  #              need to defend every design choice under questioning).
+  # "target":    smoothed mean-target encoding, fit on TRAIN ONLY, usually a
+  #              few points of extra PR-AUC but requires the smoothing +
+  #              train-only-fit discipline documented in data_preprocessing.py.
+  encoding_method: "frequency"
+  target_encoding_smoothing: 20   # only used when encoding_method: "target"
+
+model:
+  n_folds: 5
+  random_state: 42
+  early_stopping_rounds: 100
+  num_boost_round: 2000
+  lgb_params:
+    objective: "binary"
+    metric: "average_precision"
+    boosting_type: "gbdt"
+    num_leaves: 31
+    max_depth: 6
+    learning_rate: 0.03
+    feature_fraction: 0.8
+    bagging_fraction: 0.8
+    bagging_freq: 5
+    lambda_l1: 0.5
+    lambda_l2: 1.0
+    min_data_in_leaf: 50
+    verbosity: -1
+inference:
+  city_pop_fallback: 50000
