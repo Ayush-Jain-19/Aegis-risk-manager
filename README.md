@@ -8,9 +8,7 @@ Given a transaction, the system returns a fraud probability, a decision (APPROVE
 
 ## Demo
 
-**Screenshot:** _add a screenshot of the Aegis Risk Console (React frontend) here_
-
-**Live demo link:** _add link here, if available_
+**Live demo link:** (https://youtu.be/p4m5Vxv1IiE)
 
 ## Key Results
 
@@ -181,7 +179,7 @@ This doesn't make the backend highly available in the infrastructure sense — i
 The backend and frontend are separate applications and need to run in two terminals at once.
 
 ```bash
-git clone <your-repo-link>
+git clone <https://github.com/Ayush-Jain-19/Aegis-risk-manager.git>
 cd Fraud_Detection_System
 pip install -r requirements.txt
 ```
