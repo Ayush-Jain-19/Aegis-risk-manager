@@ -194,9 +194,17 @@ def evaluate_threshold_savings(
         "savings_pct": savings_pct,
     }
     logger.info(
-        "Cost @ threshold=0.5: $%.2f | Cost @ optimal threshold=%.3f: $%.2f | "
-        "Savings: $%.2f (%.1f%%)",
-        baseline["total_cost"], optimal_threshold, optimal["total_cost"],
-        savings, savings_pct,
+        "\n=== FINAL README METRICS ===\n"
+        "Held-out test set: %d transactions\n"
+        "False Positives: %d\n"
+        "False Negatives: %d\n"
+        "Cost @ optimal threshold=%.3f: $%.2f\n"
+        "============================",
+        len(y_true),
+        optimal["n_false_positives"],
+        optimal["n_false_negatives"],
+        optimal_threshold,
+        optimal["total_cost"],
     )
+    return report
     return report
